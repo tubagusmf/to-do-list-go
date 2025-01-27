@@ -1,0 +1,4 @@
+development:
+  dialect: postgres
+  datasource: postgres://postgres:postgres@127.0.0.1:5432/db_todolist?sslmode=disable
+  dir: db/migrations
