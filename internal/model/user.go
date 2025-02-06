@@ -33,6 +33,7 @@ type CustomClaims struct {
 	UserID int64 `json:"user_id"`
 	jwt.RegisteredClaims
 }
+
 type User struct {
 	Id        int64      `json:"id"`
 	Username  string     `json:"username"`

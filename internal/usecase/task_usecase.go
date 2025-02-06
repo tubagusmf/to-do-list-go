@@ -14,9 +14,7 @@ type TaskUsecase struct {
 	taskRepo model.ITaskRepository
 }
 
-func NewTaskUsecase(
-	taskRepo model.ITaskRepository,
-) model.ITaskUsecase {
+func NewTaskUsecase(taskRepo model.ITaskRepository) model.ITaskUsecase {
 	return &TaskUsecase{
 		taskRepo: taskRepo,
 	}
@@ -55,6 +53,10 @@ func (t *TaskUsecase) FindById(ctx context.Context, id int64) (*model.Task, erro
 }
 
 func (t *TaskUsecase) Create(ctx context.Context, in model.CreateTaskInput) error {
+	log := logrus.WithFields(logrus.Fields{
+		"input": in,
+	})
+
 	if err := validateCreateTaskInput(in); err != nil {
 		return err
 	}
@@ -78,6 +80,10 @@ func (t *TaskUsecase) Create(ctx context.Context, in model.CreateTaskInput) erro
 }
 
 func (t *TaskUsecase) Update(ctx context.Context, id int64, in model.UpdateTaskInput) error {
+	log := logrus.WithFields(logrus.Fields{
+		"id": id,
+	})
+
 	existingTask, err := t.taskRepo.FindById(ctx, id)
 	if err != nil {
 		log.Printf("Error fetching task by ID: %v", err)
@@ -123,6 +129,11 @@ func (t *TaskUsecase) Delete(ctx context.Context, id int64) error {
 	if task == nil {
 		log.Error("Task not found")
 		return errors.New("task not found")
+	}
+
+	if task.DeletedAt != nil {
+		log.Error("Task already deleted")
+		return errors.New("task already deleted")
 	}
 
 	err = t.taskRepo.Delete(ctx, id)
